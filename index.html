@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Romantic Love Scan</title>
+  <style>
+    :root {
+      --pink: #ff4fd8;
+      --soft-pink: #ff9eea;
+      --cyan: #7df9ff;
+      --purple: #8d5cff;
+      --white: #ffffff;
+      --dark: #050714;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      overflow: hidden;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--white);
+      background: var(--dark);
+    }
+
+    body {
+      position: relative;
+      touch-action: manipulation;
+    }
+
+    .app {
+      position: relative;
+      width: 100vw;
+      height: 100svh;
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 105%, rgba(255, 79, 216, 0.38), transparent 38%),
+        radial-gradient(circle at 5% 25%, rgba(125, 249, 255, 0.22), transparent 32%),
+        radial-gradient(circle at 95% 20%, rgba(141, 92, 255, 0.24), transparent 30%),
+        radial-gradient(circle at 50% 45%, rgba(255, 158, 234, 0.08), transparent 48%),
+        linear-gradient(145deg, #03040b 0%, #071128 38%, #180c2b 68%, #070713 100%);
+    }
+
+    .app::before,
+    .app::after {
+      content: "";
+      position: absolute;
+      width: 52vmax;
+      height: 52vmax;
+      border-radius: 999px;
+      pointer-events: none;
+      filter: blur(54px);
+      opacity: 0.32;
+      animation: orbFloat 9s ease-in-out infinite alternate;
+    }
+
+    .app::before {
+      left: -28vmax;
+      bottom: -26vmax;
+      background: rgba(255, 79, 216, 0.68);
+    }
+
+    .app::after {
+      right: -30vmax;
+      top: -24vmax;
+      background: rgba(125, 249, 255, 0.45);
+      animation-delay: -2.5s;
+    }
+
+    @keyframes orbFloat {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(24px, -18px, 0) scale(1.08); }
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(1.025);
+      filter: blur(12px);
+      transition: opacity 900ms ease, transform 900ms ease, filter 900ms ease, visibility 900ms ease;
+      z-index: 2;
+    }
+
+    .screen.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1);
+      filter: blur(0);
+    }
+
+    .glass-card {
+      width: min(90vw, 390px);
+      position: relative;
+      overflow: hidden;
+      border-radius: 28px;
+      padding: 30px 25px;
+      text-align: center;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.045));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow:
+        0 22px 80px rgba(0, 0, 0, 0.38),
+        0 0 48px rgba(255, 79, 216, 0.18),
+        inset 0 0 24px rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      animation: breathe 3.8s ease-in-out infinite;
+    }
+
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+      transform: translateX(-130%);
+      animation: shine 4.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.025); }
+    }
+
+    @keyframes shine {
+      0%, 55% { transform: translateX(-130%); }
+      100% { transform: translateX(130%); }
+    }
+
+    .loader-icon {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 20px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 79, 216, 0.3), transparent 54%),
+        rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.17);
+      box-shadow: 0 0 34px rgba(255, 79, 216, 0.34);
+    }
+
+    .scanner {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: inset 0 0 20px rgba(125, 249, 255, 0.22);
+    }
+
+    .scanner::before {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--pink);
+      border-right-color: rgba(125, 249, 255, 0.85);
+      filter: drop-shadow(0 0 8px rgba(255, 79, 216, 0.8));
+      animation: spin 1.6s linear infinite;
+    }
+
+    .scanner::after {
+      content: "♡";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+      color: #fff;
+      text-shadow: 0 0 14px var(--pink);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-title {
+      font-size: clamp(1.1rem, 4.5vw, 1.38rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-shadow: 0 0 22px rgba(255, 255, 255, 0.22);
+      min-height: 34px;
+      transition: opacity 450ms ease, transform 450ms ease;
+    }
+
+    .loading-title.switching {
+      opacity: 0;
+      transform: translateY(6px) scale(0.98);
+    }
+
+    .loading-sub {
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.66);
+      font-size: 0.88rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .progress-wrap {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      padding: 3px;
+      margin-top: 24px;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ff9eea, #ff4fd8, #7df9ff);
+      box-shadow: 0 0 20px rgba(255, 79, 216, 0.9);
+      transition: width 170ms linear;
+    }
+
+    .loading-percent {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.68);
+    }
+
+    .rain-area {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      contain: layout paint;
+    }
+
+    .rain-item {
+      position: absolute;
+      top: -12vh;
+      left: var(--x);
+      color: var(--c);
+      font-size: var(--s);
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      opacity: var(--o);
+      white-space: nowrap;
+      filter: blur(var(--b));
+      text-shadow:
+        0 0 10px currentColor,
+        0 0 22px currentColor;
+      animation: rainFall var(--d) linear forwards;
+      animation-delay: var(--delay);
+      will-change: transform, opacity;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    @keyframes rainFall {
+      0% {
+        transform: translate3d(0, -10vh, 0) rotate(var(--r));
+        opacity: 0;
+      }
+      12% { opacity: var(--o); }
+      85% { opacity: var(--o); }
+      100% {
+        transform: translate3d(var(--drift), 118vh, 0) rotate(calc(var(--r) + 16deg));
+        opacity: 0;
+      }
+    }
+
+    .rain-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%);
+      width: min(88vw, 360px);
+      text-align: center;
+      color: rgba(255, 255, 255, 0.52);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      text-shadow: 0 0 16px rgba(255, 79, 216, 0.28);
+      animation: hintPulse 2.7s ease-in-out infinite;
+    }
+
+    @keyframes hintPulse {
+      0%, 100% { opacity: 0.36; transform: translateX(-50%) translateY(0); }
+      50% { opacity: 0.72; transform: translateX(-50%) translateY(-4px); }
+    }
+
+    .final-card h1 {
+      font-size: clamp(1.55rem, 6vw, 2rem);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      text-transform: lowercase;
+      margin-bottom: 16px;
+      background: linear-gradient(90deg, #fff, #ffb3ef, #8ffcff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 34px rgba(255, 79, 216, 0.16);
+    }
+
+    .final-card p {
+      color: rgba(255, 255, 255, 0.76);
+      font-size: clamp(0.95rem, 3.7vw, 1.03rem);
+      line-height: 1.75;
+      margin-bottom: 24px;
+    }
+
+    .replay-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 999px;
+      padding: 15px 20px;
+      cursor: pointer;
+      color: white;
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      background: linear-gradient(90deg, #ff5cda, #ff8de7, #7df9ff);
+      box-shadow:
+        0 14px 30px rgba(255, 79, 216, 0.24),
+        0 0 30px rgba(125, 249, 255, 0.12);
+      transition: transform 200ms ease, filter 200ms ease, box-shadow 200ms ease;
+    }
+
+    .replay-btn:active {
+      transform: scale(0.97);
+    }
+
+    .replay-btn:hover {
+      filter: brightness(1.08);
+      box-shadow:
+        0 18px 42px rgba(255, 79, 216, 0.3),
+        0 0 40px rgba(125, 249, 255, 0.18);
+    }
+
+    .click-pop {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 20;
+      pointer-events: none;
+      color: var(--pop-color);
+      font-size: var(--pop-size);
+      text-shadow: 0 0 14px currentColor;
+      animation: popFloat 900ms ease-out forwards;
+      will-change: transform, opacity;
+    }
+
+    @keyframes popFloat {
+      0% {
+        transform: translate3d(-50%, -50%, 0) scale(0.55) rotate(0deg);
+        opacity: 0;
+      }
+      18% { opacity: 1; }
+      100% {
+        transform: translate3d(calc(-50% + var(--pop-x)), calc(-50% - 72px), 0) scale(1.35) rotate(var(--pop-r));
+        opacity: 0;
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 430px) {
+      .screen {
+        padding: 18px;
+      }
+
+      .glass-card {
+        width: min(92vw, 360px);
+        border-radius: 25px;
+        padding: 27px 21px;
+      }
+
+      .loader-icon {
+        width: 68px;
+        height: 68px;
+        border-radius: 22px;
+      }
+
+      .rain-hint {
+        bottom: 18px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <section class="screen active" id="loadingScreen" aria-label="Loading screen">
+      <div class="glass-card">
+        <div class="loader-icon" aria-hidden="true">
+          <div class="scanner"></div>
+        </div>
+        <div class="loading-title" id="loadingText">tunggu sebentar yaa mass...</div>
+        <div class="loading-sub">entering love system</div>
+        <div class="progress-wrap" aria-hidden="true">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="loading-percent" id="loadingPercent">0%</div>
+      </div>
+    </section>
+
+    <section class="screen" id="rainScreen" aria-label="Love rain screen">
+      <div class="rain-area" id="rainArea"></div>
+      <div class="rain-hint">happy birthday heri · 24 · made with love</div>
+    </section>
+
+    <section class="screen" id="finalScreen" aria-label="Final message screen">
+      <div class="glass-card final-card">
+        <h1>special message for you</h1>
+        <p>
+          aku cuma mau bilang, kamu itu spesial banget buat aku. makasih udah jadi orang yang selalu aku banggain. semoga hari kamu selalu dipenuhi hal-hal baik, dan semoga kamu selalu inget kalau ada aku yang sayang sama kamu.
+        </p>
+        <button class="replay-btn" id="replayBtn" type="button">ulang dari awal</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const loadingScreen = document.getElementById("loadingScreen");
+    const rainScreen = document.getElementById("rainScreen");
+    const finalScreen = document.getElementById("finalScreen");
+    const progressBar = document.getElementById("progressBar");
+    const loadingText = document.getElementById("loadingText");
+    const loadingPercent = document.getElementById("loadingPercent");
+    const rainArea = document.getElementById("rainArea");
+    const replayBtn = document.getElementById("replayBtn");
+
+    const loadingDuration = 5600;
+    const rainDuration = 13500;
+    const rainItems = ["happy birthday heri", "24", "♡", "💗", "✨"];
+    const rainColors = ["#ffffff", "#bfffff", "#7df9ff", "#ff9eea", "#ff4fd8", "#ff6f91"];
+    let timers = [];
+    let rainInterval = null;
+
+    function clearTimers() {
+      timers.forEach(timer => clearTimeout(timer));
+      timers = [];
+      if (rainInterval) clearInterval(rainInterval);
+      rainInterval = null;
+    }
+
+    function showScreen(screen) {
+      [loadingScreen, rainScreen, finalScreen].forEach(item => item.classList.remove("active"));
+      screen.classList.add("active");
+    }
+
+    function setLoadingText(text) {
+      loadingText.classList.add("switching");
+      timers.push(setTimeout(() => {
+        loadingText.textContent = text;
+        loadingText.classList.remove("switching");
+      }, 380));
+    }
+
+    function startLoading() {
+      clearTimers();
+      rainArea.innerHTML = "";
+      progressBar.style.width = "0%";
+      loadingPercent.textContent = "0%";
+      loadingText.textContent = "tunggu sebentar yaa mass...";
+      loadingText.classList.remove("switching");
+      showScreen(loadingScreen);
+
+      const startedAt = performance.now();
+      let textChanged = false;
+
+      function animateProgress(now) {
+        const elapsed = now - startedAt;
+        const rawProgress = Math.min(elapsed / loadingDuration, 1);
+        const easedProgress = 1 - Math.pow(1 - rawProgress, 3);
+        const percent = Math.min(Math.round(easedProgress * 100), 100);
+
+        progressBar.style.width = percent + "%";
+        loadingPercent.textContent = percent + "%";
+
+        if (!textChanged && percent >= 86) {
+          textChanged = true;
+          setLoadingText("udah nih mass...");
+        }
+
+        if (rawProgress < 1) {
+          requestAnimationFrame(animateProgress);
+        } else {
+          timers.push(setTimeout(startRain, 650));
+        }
+      }
+
+      requestAnimationFrame(animateProgress);
+    }
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function pick(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function createRainItem() {
+      const item = document.createElement("span");
+      const text = pick(rainItems);
+      const isLove = text.includes("♡") || text.includes("💗");
+      const isLongText = text.length > 5;
+      const size = isLongText ? random(14, 25) : random(20, 42);
+      const color = isLove ? pick(["#ff4fd8", "#ff7aa8", "#ff9eea"]) : pick(rainColors);
+
+      item.className = "rain-item";
+      item.textContent = text;
+      item.style.setProperty("--x", random(2, 92) + "vw");
+      item.style.setProperty("--s", size + "px");
+      item.style.setProperty("--c", color);
+      item.style.setProperty("--o", random(0.42, 0.86));
+      item.style.setProperty("--b", random(0, 0.65) + "px");
+      item.style.setProperty("--d", random(8.8, 14.5) + "s");
+      item.style.setProperty("--delay", random(-2.5, 0.5) + "s");
+      item.style.setProperty("--r", random(-9, 9) + "deg");
+      item.style.setProperty("--drift", random(-24, 24) + "px");
+
+      rainArea.appendChild(item);
+
+      item.addEventListener("animationend", () => item.remove(), { once: true });
+    }
+
+    function startRain() {
+      rainArea.innerHTML = "";
+      showScreen(rainScreen);
+
+      const initialCount = window.innerWidth <= 430 ? 28 : 42;
+      const intervalSpeed = window.innerWidth <= 430 ? 380 : 290;
+
+      for (let i = 0; i < initialCount; i++) {
+        timers.push(setTimeout(createRainItem, i * 95));
+      }
+
+      rainInterval = setInterval(() => {
+        const currentItems = rainArea.childElementCount;
+        const maxItems = window.innerWidth <= 430 ? 54 : 82;
+        if (currentItems < maxItems) createRainItem();
+      }, intervalSpeed);
+
+      timers.push(setTimeout(() => {
+        if (rainInterval) clearInterval(rainInterval);
+        rainInterval = null;
+        showFinal();
+      }, rainDuration));
+    }
+
+    function showFinal() {
+      showScreen(finalScreen);
+      timers.push(setTimeout(() => {
+        rainArea.innerHTML = "";
+      }, 1100));
+    }
+
+    function createClickPop(x, y) {
+      const pop = document.createElement("span");
+      const icons = ["♡", "💗", "✨", "✦"];
+      pop.className = "click-pop";
+      pop.textContent = pick(icons);
+      pop.style.left = x + "px";
+      pop.style.top = y + "px";
+      pop.style.setProperty("--pop-color", pick(["#ff9eea", "#ff4fd8", "#7df9ff", "#ffffff"]));
+      pop.style.setProperty("--pop-size", random(18, 28) + "px");
+      pop.style.setProperty("--pop-x", random(-28, 28) + "px");
+      pop.style.setProperty("--pop-r", random(-22, 22) + "deg");
+      document.body.appendChild(pop);
+      pop.addEventListener("animationend", () => pop.remove(), { once: true });
+    }
+
+    document.addEventListener("pointerdown", event => {
+      createClickPop(event.clientX, event.clientY);
+    });
+
+    replayBtn.addEventListener("click", startLoading);
+
+    window.addEventListener("resize", () => {
+      document.documentElement.style.setProperty("--vh", window.innerHeight * 0.01 + "px");
+    });
+
+    startLoading();
+  </script>
+</body>
+</html>
